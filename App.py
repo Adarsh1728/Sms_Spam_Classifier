@@ -34,7 +34,7 @@ def transform_text(text):
     return " ".join(y)
 
 try:
-    Tfidf = pickle.load(open('Vectorizer.pkl', 'rb'))
+    Tfidf = pickle.load(open('vacterizer.pkl', 'rb'))
     model = pickle.load(open('model.pkl', 'rb'))
 except FileNotFoundError as e:
     st.error(f"Error: {e}")
