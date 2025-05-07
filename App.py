@@ -1,63 +1,59 @@
-import numpy as np
-import pandas as pd
-import streamlit as st
-import requests
 import pickle
-import string
-from nltk.corpus import stopwords
-from nltk.stem.porter import PorterStemmer
-from sklearn.feature_extraction.text import TfidfVectorizer
+import streamlit as st
+from win32com.client import Dispatch
+import pythoncom
 
-import nltk
-nltk.download('stopwords')
+# Function to speak the result
+def speak(text):
+    try:
+        pythoncom.CoInitialize()
+        speak_engine = Dispatch("SAPI.SpVoice")
+        speak_engine.Speak(text)
+        pythoncom.CoUninitialize()
+    except Exception as e:
+        print(f"Text-to-speech error: {e}")
 
-ps=PorterStemmer()
-
-def transform_text(text):
-    text = text.lower()
-    text = text.split()  # Split into words
-    y = [word for word in text if word.isalnum()]  # Keep only alphanumeric words
-
-    text=y[:]
-    y.clear()
-
-    for word in text:
-        if word not in stopwords.words('english') and word not in string.punctuation:
-            y.append(word)
-    
-
-    text=y[:]
-    y.clear()
-    for word in text:
-        y.append(ps.stem(word))
-        
-    return " ".join(y)
-
+# Load model and vectorizer safely
 try:
-    Tfidf = pickle.load(open('vacterizer.pkl', 'rb'))
-    model = pickle.load(open('model.pkl', 'rb'))
-except FileNotFoundError as e:
-    st.error(f"Error: {e}")
+    with open("model.pkl", "rb") as model_file, open("Vectorizer.pkl", "rb") as vectorizer_file:
+        model = pickle.load(model_file)
+        Vectorizer = pickle.load(vectorizer_file)
+except Exception as e:
+    st.error(f"Failed to load model/vectorizer: {e}")
+    st.stop()
 
+# Streamlit App
+def main():
+    st.title("📧 Email Spam Classifier")
+    st.subheader("Built with Streamlit & Python")
 
-st.title(" 📩 Email/SMS Spam Classifiers")
-input_Sms=st.text_area("Enter the message")
+    msg = st.text_area("Enter a message:")
 
-#Button
-if st.button('predict'):
- 
- # Preprosissing
-    transformed_sms= transform_text(input_Sms)
+    if st.button("Predict"):
+        if not msg.strip():
+            st.warning("Please enter a message.")
+            return
 
-# Vectorize
-    vector_input = Tfidf.transform([transformed_sms])
+        try:
+            # Ensure vectorizer exists before transformation
+            if Vectorizer:
+                data = [msg]
+                vect = Vectorizer.transform(data).toarray()
+                prediction = model.predict(vect)
+                result = prediction[0]
 
-#Pridict
-    result=model.predict(vector_input)[0]
+                # Display result
+                if result == 1:
+                    st.header("🚫 Spam")
+                    speak("It's Spam.")
+                else:
+                    st.header("✅ Not Spam")
+                    speak("It's not Spam.")
+            else:
+                st.error("Vectorizer is not initialized properly.")
+        except Exception as e:
+            st.error(f"Prediction failed: {e}")
 
-# Display
-    if result == 1:
-        st.header("Spam")
-    else:
-        st.header("Not Spam")
-        
+# Run the app
+if __name__ == "__main__":
+    main()
