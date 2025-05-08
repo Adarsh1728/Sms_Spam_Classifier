@@ -2,11 +2,9 @@ import pickle
 from flask import Flask, render_template, request, jsonify
 from win32com.client import Dispatch
 import pythoncom
-from flask_cors import CORS
 
 # Use correct folder name for templates
-app = Flask(__name__, template_folder="Templtes")
-CORS(app)
+app = Flask(__name__, template_folder="templates")
 
 # Function to speak the result using Windows speech
 def speak(text):
@@ -55,7 +53,7 @@ def home():
 # Prediction route
 @app.route("/predict", methods=["POST"])
 def predict():
-    msg = request.form.get("message", "")
+    msg = request.form.get("message") or request.json.get("message")
     
     if not msg.strip():
         return jsonify({"error": "Please enter a message."})
