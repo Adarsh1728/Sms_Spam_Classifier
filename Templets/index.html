@@ -28,6 +28,12 @@
             max-width: 600px;
         }
 
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
         textarea {
             width: 100%;
             padding: 10px;
@@ -59,9 +65,10 @@
     </style>
 </head>
 <body>
-    <h2>📧 Sms Spam Classifier</h2>
-    <form method="POST" action="/predict">
-        <textarea name="message" rows="6" placeholder="Enter your Sms message here..."></textarea><br><br>
+    <h2>📧 SMS Spam Classifier</h2>
+    <form method="POST">
+        <label for="message">SMS Message:</label>
+        <textarea id="message" name="message" rows="6" placeholder="Enter your SMS message here..." required></textarea><br><br>
         <button type="submit">Predict</button>
     </form>
 

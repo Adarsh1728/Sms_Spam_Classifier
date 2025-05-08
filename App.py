@@ -58,8 +58,8 @@ def predict():
     if not msg.strip():
         return jsonify({"error": "Please enter a message."})
 
-    if not model or not Vectorizer:
-        return jsonify({"error": "Model or Vectorizer not initialized properly."})
+    if model is None or Vectorizer is None:
+       return jsonify({"error": "Model or Vectorizer not loaded."})
 
     try:
         vect = Vectorizer.transform([msg]).toarray()
