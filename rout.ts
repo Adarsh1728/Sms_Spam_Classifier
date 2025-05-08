@@ -1,26 +1,23 @@
-<<<<<<< HEAD
-fetch('http://localhost:5000/predict', {
-    method: 'POST',
-    body: new URLSearchParams({ message: "your text here" }),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    }
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Result:", data.result);
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class SpamClassifierService {
+  private apiUrl = 'http://127.0.0.1:5000/predict'; // or your deployed URL
+
+  constructor(private http: HttpClient) {}
+
+  predictMessage(message: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded'
     });
-=======
-fetch('http://localhost:5000/predict', {
-    method: 'POST',
-    body: new URLSearchParams({ message: "your text here" }),
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-    }
-  })
-    .then(res => res.json())
-    .then(data => {
-      console.log("Result:", data.result);
-    });
->>>>>>> 3785f4f76d85cd007e25796e4041549e7c398167
-  
+
+    const body = new URLSearchParams();
+    body.set('message', message);
+
+    return this.http.post(this.apiUrl, body.toString(), { headers });
+  }
+}
