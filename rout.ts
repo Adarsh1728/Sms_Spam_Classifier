@@ -1,12 +1,12 @@
 fetch('http://127.0.0.1:5000/predict', {
-    method: 'GET',
+    method: 'POST',  // ✅ must be POST, not GET
     body: new URLSearchParams({ message: "your text here" }),
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     }
   })
-    .then(res => res.json())
+    .then(res => res.text())  // or .json() if response is JSON
     .then(data => {
-      console.log("Result:", data.result);
+      console.log("Result:", data);
     });
   
