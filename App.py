@@ -2,9 +2,11 @@ import pickle
 from flask import Flask, render_template, request, jsonify
 from win32com.client import Dispatch
 import pythoncom
+from flask_cors import CORS
 
 # Use correct folder name for templates
 app = Flask(__name__, template_folder="Templtes")
+CORS(app)
 
 # Function to speak the result using Windows speech
 def speak(text):

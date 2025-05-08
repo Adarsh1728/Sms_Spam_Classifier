@@ -1,12 +1,13 @@
 fetch('http://127.0.0.1:5000/predict', {
-    method: 'POST',  // ✅ must be POST, not GET
-    body: new URLSearchParams({ message: "your text here" }),
+    method: 'POST', // Must be POST
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
-    }
+    },
+    body: new URLSearchParams({
+      message: "Congratulations! You've won a free iPhone."
+    }),
   })
-    .then(res => res.text())  // or .json() if response is JSON
-    .then(data => {
-      console.log("Result:", data);
-    });
+    .then(res => res.text())
+    .then(data => console.log(data))
+    .catch(err => console.error("Error:", err));
   
