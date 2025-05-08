@@ -51,7 +51,7 @@ def home():
     return render_template("index.html")  # Make sure index.html is inside /templates
 
 # Prediction route
-@app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
     msg = request.form.get("message", "")
     
