@@ -53,7 +53,7 @@ def home():
 # Prediction route
 @app.route("/predict", methods=["POST"])
 def predict():
-    msg = request.form.get("message") or request.json.get("message")
+    msg = request.form.get("message") 
     
     if not msg.strip():
         return jsonify({"error": "Please enter a message."})
