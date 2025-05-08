@@ -2,9 +2,10 @@ import pickle
 from flask import Flask, render_template, request, jsonify
 from win32com.client import Dispatch
 import pythoncom
-
+from flask_cors import CORS
 # Use correct folder name for templates
-app = Flask(__name__, template_folder="templates")
+App = Flask(__name__, template_folder="templates")
+CORS(App)
 
 # Function to speak the result using Windows speech
 def speak(text):
@@ -46,13 +47,13 @@ with open("Vectorizer.pkl", "wb") as vect_file:
 print("Model and Vectorizer saved successfully.")
     
 # Home route
-@app.route("/")
+@App.route("/")
 def home():
     return render_template("index.html")  # Make sure index.html is inside /templates
 
 # Prediction route
-@app.route("/predict", methods=["POST"])
-@app.route("/predict", methods=["POST"])
+@App.route("/predict", methods=["POST"])
+@App.route("/predict", methods=["POST"])
 def predict():
     msg = request.form.get("message") or request.json.get("message")
 
@@ -72,5 +73,5 @@ def predict():
 
 # Run app
 if __name__ == "__main__":
-    app.run(debug=True)
+    App.run(debug=True)
 
