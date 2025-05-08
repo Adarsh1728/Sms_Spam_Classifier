@@ -4,7 +4,7 @@ from win32com.client import Dispatch
 import pythoncom
 
 # Use correct folder name for templates
-app = Flask(__name__, template_folder="Templets")
+app = Flask(__name__, template_folder="Templtes")
 
 # Function to speak the result using Windows speech
 def speak(text):
@@ -58,8 +58,8 @@ def predict():
     if not msg.strip():
         return jsonify({"error": "Please enter a message."})
 
-    if model is None or Vectorizer is None:
-       return jsonify({"error": "Model or Vectorizer not loaded."})
+    if not model or not Vectorizer:
+        return jsonify({"error": "Model or Vectorizer not initialized properly."})
 
     try:
         vect = Vectorizer.transform([msg]).toarray()
