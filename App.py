@@ -67,9 +67,10 @@ def predict():
         result = "Spam" if prediction == 1 else "Not Spam"
 
         speak(f"It's {result}.")
-        return jsonify({"result": result})
+        return render_template("index.html", result=result)
+
     except Exception as e:
-        return jsonify({"error": f"Prediction failed: {e}"})
+        return render_template("index.html", result=f"Prediction failed: {e}")
 
 # Run app
 if __name__ == "__main__":
