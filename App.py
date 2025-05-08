@@ -52,14 +52,12 @@ def home():
 
 # Prediction route
 @app.route("/predict", methods=["POST"])
+@app.route("/predict", methods=["POST"])
 def predict():
     msg = request.form.get("message") or request.json.get("message")
-    
-    if not msg.strip():
-        return jsonify({"error": "Please enter a message."})
 
-    if not model or not Vectorizer:
-        return jsonify({"error": "Model or Vectorizer not initialized properly."})
+    if not msg or not msg.strip():
+        return jsonify({"error": "Please enter a message."}), 400
 
     try:
         vect = Vectorizer.transform([msg]).toarray()
@@ -75,3 +73,4 @@ def predict():
 # Run app
 if __name__ == "__main__":
     app.run(debug=True)
+
