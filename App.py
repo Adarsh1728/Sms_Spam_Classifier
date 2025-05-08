@@ -4,7 +4,7 @@ from win32com.client import Dispatch
 import pythoncom
 
 # Use correct folder name for templates
-app = Flask(__name__, template_folder="Templates")
+app = Flask(__name__, template_folder="Templets")
 
 # Function to speak the result using Windows speech
 def speak(text):
