@@ -10,8 +10,7 @@ import pythoncom
 
 # Initialize Flask app
 App = Flask(__name__)
-CORS(App, origins=["https://yourfrontenddomain.com"])
-
+CORS(App)
 
 # Function to use Windows speech for result announcement
 def speak(text):
