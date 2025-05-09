@@ -4,7 +4,7 @@ from win32com.client import Dispatch
 import pythoncom
 from flask_cors import CORS
 # Use correct folder name for templates
-App = Flask(__name__, template_folder="templates")
+App = Flask(__name__)
 CORS(App)
 
 # Function to speak the result using Windows speech
@@ -53,7 +53,6 @@ def home():
 
 # Prediction route
 @App.route("/predict", methods=["POST"])
-@App.route("/predict", methods=["POST"])
 def predict():
     msg = request.form.get("message") or request.json.get("message")
 
@@ -69,9 +68,8 @@ def predict():
         return render_template("index.html", result=result)
 
     except Exception as e:
-        return render_template("index.html", result=f"Prediction failed: {e}")
+        return render_template("index.html", result='Prediction: {}'.format(result))
 
 # Run app
 if __name__ == "__main__":
     App.run(debug=True)
-
