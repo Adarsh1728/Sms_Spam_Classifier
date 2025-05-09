@@ -53,6 +53,7 @@ def home():
 
 # Prediction route
 @App.route("/predict", methods=["POST"])
+
 def predict():
     msg = request.form.get("message") or request.json.get("message")
 
@@ -68,7 +69,7 @@ def predict():
         return render_template("index.html", result=result)
 
     except Exception as e:
-        return render_template("index.html", result='Prediction: {}'.format(result))
+        return render_template("index.html", result=f"Prediction failed: {e}")
 
 # Run app
 if __name__ == "__main__":

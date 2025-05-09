@@ -60,7 +60,7 @@
 </head>
 <body>
     <h2>📧 Sms Spam Classifier</h2>
-    <form method="POST" action="{{url_for('predict')}}">
+    <form method="POST" action="/predict">
         <textarea name= "message" rows="6" placeholder="Enter your Sms message here..."></textarea><br><br>
         <button type="submit">Predict</button>
     </form>
