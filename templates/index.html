@@ -1,71 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><h1>Sms Spam Classifier</h1></title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: hwb(117 0% 91%);
-            color: hsl(0, 30%, 11%);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 40px;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sms Spam Classifier</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e8f5e9;
+      color: #1b1b1b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
 
     h2 {
-        color: #2c3e50;
+      color: #2c3e50;
     }
 
     form {
-        background-color: hsl(75, 92%, 28%);
-        padding: 20px 30px;
-        border-radius: 8px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.301);
-        width: 100%;
-        max-width: 600px;
+      background-color: #aee571;
+      padding: 20px 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 600px;
     }
 
     textarea {
-        width: 100%;
-        padding: 10px;
-        font-size: 16px;
-        border-radius: 4px;
-        border: 1px solid hsl(227, 92%, 64%);
-        resize: vertical;
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #5fa4f7;
+      resize: vertical;
     }
 
     button {
-        margin-top: 10px;
-        padding: 10px 20px;
-        font-size: 16px;
-        background-color: #3498db;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
     button:hover {
-        background-color: #2980b9;
+      background-color: #2980b9;
     }
 
     h3 {
-        margin-top: 20px;
-        color: #27ae60;
+      margin-top: 20px;
+      color: #27ae60;
     }
-</style>
+  </style>
 </head>
 <body>
-    <h2>📧 Sms Spam Classifier</h2>
-    <form method="POST" action="/predict">
-        <textarea name= "message" rows="6" placeholder="Enter your Sms message here..."></textarea><br><br>
-        <button type="submit">Predict</button>
-    </form>
-    <br>
-      Prediction: {{ result }}
-</br>
+  <h2>📧 Sms Spam Classifier</h2>
+  <form id="spam-form">
+    <textarea name="message" rows="6" placeholder="Enter your SMS message here..."></textarea><br><br>
+    <button type="submit" id="submit-btn">Predict</button>
+  </form>
+  <h3 id="result"></h3>
+
+  <script>
+    document.getElementById('spam-form').addEventListener('submit', function(event) {
+      event.preventDefault(); // Prevent form from submitting normally
+
+      const message = document.querySelector('textarea[name="message"]').value;
+
+      fetch('http://127.0.0.1:5000/api', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('result').innerText = "Prediction: " + data.result;
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById('result').innerText = "Error: " + error;
+      });
+    });
+  </script>
 </body>
 </html>

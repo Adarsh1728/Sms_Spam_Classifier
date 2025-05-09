@@ -54,22 +54,18 @@ def home():
 # Prediction route
 @App.route("/predict", methods=["POST"])
 
-def predict():
-    msg = request.form.get("message") or request.json.get("message")
+@App.route('/api', methods=['POST'])
+def api_predict():
+    data = request.get_json()
+    msg = data.get('message', '')
+    if not msg:
+        return jsonify({'result': 'No message received'}), 400
 
-    if not msg or not msg.strip():
-        return jsonify({"error": "Please enter a message."}), 400
-
-    try:
-        vect = Vectorizer.transform([msg]).toarray()
-        prediction = model.predict(vect)[0]
-        result = "Spam" if prediction == 1 else "Not Spam"
-
-        speak(f"It's {result}.")
-        return render_template("index.html", result=result)
-
-    except Exception as e:
-        return render_template("index.html", result=f"Prediction failed: {e}")
+    vect = Vectorizer.transform([msg]).toarray()
+    prediction = model.predict(vect)[0]
+    result = "Spam" if prediction == 1 else "Not Spam"
+    speak(f"It's {result}.")
+    return jsonify({'result': result})
 
 # Run app
 if __name__ == "__main__":
