@@ -1,13 +1,18 @@
+# Import necessary libraries
 import pickle
+import pandas as pd
 from flask import Flask, render_template, request, jsonify
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.naive_bayes import MultinomialNB
+from flask_cors import CORS
 from win32com.client import Dispatch
 import pythoncom
-from flask_cors import CORS
-# Use correct folder name for templates
+
+# Initialize Flask app
 App = Flask(__name__)
 CORS(App)
 
-# Function to speak the result using Windows speech
+# Function to use Windows speech for result announcement
 def speak(text):
     try:
         pythoncom.CoInitialize()
@@ -17,23 +22,17 @@ def speak(text):
     except Exception as e:
         print(f"Text-to-speech error: {e}")
 
-# Load model and vectorizer
-import pandas as pd
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-import pickle
-
-# Load data
+# Load and preprocess dataset
 df = pd.read_csv("spam.csv", encoding="latin-1")[["v1", "v2"]]
 df.columns = ["label", "text"]
 df["label_num"] = df.label.map({"ham": 0, "spam": 1})
 
-# Vectorization
+# Vectorize text data
 Vectorizer = CountVectorizer()
 X = Vectorizer.fit_transform(df["text"])
 y = df["label_num"]
 
-# Train model
+# Train Naïve Bayes model
 model = MultinomialNB()
 model.fit(X, y)
 
@@ -45,15 +44,13 @@ with open("Vectorizer.pkl", "wb") as vect_file:
     pickle.dump(Vectorizer, vect_file)
 
 print("Model and Vectorizer saved successfully.")
-    
-# Home route
+
+# Define home route
 @App.route("/")
 def home():
-    return render_template("index.html")  # Make sure index.html is inside /templates
+    return render_template("index.html")
 
-# Prediction route
-@App.route("/predict", methods=["POST"])
-
+# Define API route for spam prediction
 @App.route('/api', methods=['POST'])
 def api_predict():
     data = request.get_json()
@@ -67,6 +64,6 @@ def api_predict():
     speak(f"It's {result}.")
     return jsonify({'result': result})
 
-# Run app
+# Run Flask app
 if __name__ == "__main__":
     App.run(debug=True)
