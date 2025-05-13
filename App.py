@@ -1,69 +1,45 @@
-# Import necessary libraries
+import streamlit as st
 import pickle
-import pandas as pd
-from flask import Flask, render_template, request, jsonify
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.naive_bayes import MultinomialNB
-from flask_cors import CORS
-from win32com.client import Dispatch
-import pythoncom
+import string
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
 
-# Initialize Flask app
-App = Flask(__name__)
-CORS(App)
+# Download NLTK stopwords
+nltk.download('stopwords')
 
-# Function to use Windows speech for result announcement
-def speak(text):
-    try:
-        pythoncom.CoInitialize()
-        speaker = Dispatch("SAPI.SpVoice")
-        speaker.Speak(text)
-        pythoncom.CoUninitialize()
-    except Exception as e:
-        print(f"Text-to-speech error: {e}")
+ps = PorterStemmer()
 
-# Load and preprocess dataset
-df = pd.read_csv("spam.csv", encoding="latin-1")[["v1", "v2"]]
-df.columns = ["label", "text"]
-df["label_num"] = df.label.map({"ham": 0, "spam": 1})
+def transform_text(text):
+    text = text.lower()
+    text = text.split()
+    y = [word for word in text if word.isalnum()]
+    y = [ps.stem(word) for word in y if word not in stopwords.words('english') and word not in string.punctuation]
+    return " ".join(y)
 
-# Vectorize text data
-Vectorizer = CountVectorizer()
-X = Vectorizer.fit_transform(df["text"])
-y = df["label_num"]
+# Load model and vectorizer
+try:
+    with open("model.pkl", "rb") as model_file:
+        model = pickle.load(model_file)
+    with open("Vectorizer.pkl", "rb") as vect_file:
+        vectorizer = pickle.load(vect_file)
+except Exception as e:
+    st.error(f"Error loading model/vectorizer: {e}")
+    st.stop()
 
-# Train Naïve Bayes model
-model = MultinomialNB()
-model.fit(X, y)
+st.set_page_config(page_title="SMS Spam Classifier", layout="centered")
+st.title("📩 SMS/Email Spam Classifier")
 
-# Save model and vectorizer
-with open("model.pkl", "wb") as model_file:
-    pickle.dump(model, model_file)
+input_sms = st.text_area("Enter your message:", height=150)
 
-with open("Vectorizer.pkl", "wb") as vect_file:
-    pickle.dump(Vectorizer, vect_file)
-
-print("Model and Vectorizer saved successfully.")
-
-# Define home route
-@App.route("/")
-def home():
-    return render_template("index.html")
-
-# Define API route for spam prediction
-@App.route('/api', methods=['POST'])
-def api_predict():
-    data = request.get_json()
-    msg = data.get('message', '')
-    if not msg:
-        return jsonify({'result': 'No message received'}), 400
-
-    vect = Vectorizer.transform([msg]).toarray()
-    prediction = model.predict(vect)[0]
-    result = "Spam" if prediction == 1 else "Not Spam"
-    speak(f"It's {result}.")
-    return jsonify({'result': result})
-
-# Run Flask app
-if __name__ == "__main__":
-    App.run(debug=True)
+if st.button("Predict"):
+    if not input_sms.strip():
+        st.warning("Please enter a message.")
+    else:
+        transformed_sms = transform_text(input_sms)
+        vector_input = vectorizer.transform([transformed_sms])
+        prediction = model.predict(vector_input)[0]
+        if prediction == 1:
+            st.error("❌ Spam")
+        else:
+            st.success("✅ Not Spam")
